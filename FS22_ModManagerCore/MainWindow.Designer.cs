@@ -125,9 +125,9 @@ namespace FS22_ModManagerCore
             // Lst_ModList
             // 
             this.Lst_ModList.HideSelection = false;
-            this.Lst_ModList.Location = new System.Drawing.Point(786, 38);
+            this.Lst_ModList.Location = new System.Drawing.Point(760, 93);
             this.Lst_ModList.Name = "Lst_ModList";
-            this.Lst_ModList.Size = new System.Drawing.Size(428, 606);
+            this.Lst_ModList.Size = new System.Drawing.Size(466, 576);
             this.Lst_ModList.TabIndex = 6;
             this.Lst_ModList.UseCompatibleStateImageBehavior = false;
             // 
@@ -141,10 +141,10 @@ namespace FS22_ModManagerCore
             // 
             // Txtbox_ModInfoDisplay
             // 
-            this.Txtbox_ModInfoDisplay.Location = new System.Drawing.Point(391, 183);
+            this.Txtbox_ModInfoDisplay.Location = new System.Drawing.Point(394, 177);
             this.Txtbox_ModInfoDisplay.Multiline = true;
             this.Txtbox_ModInfoDisplay.Name = "Txtbox_ModInfoDisplay";
-            this.Txtbox_ModInfoDisplay.Size = new System.Drawing.Size(311, 418);
+            this.Txtbox_ModInfoDisplay.Size = new System.Drawing.Size(311, 492);
             this.Txtbox_ModInfoDisplay.TabIndex = 8;
             // 
             // MainWindow

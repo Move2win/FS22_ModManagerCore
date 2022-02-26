@@ -103,6 +103,7 @@ namespace FS22_ModManagerCore
             {
                 Btn_GetModFolder.Enabled = false;
                 Txtbox_ModFolder.Enabled = false;
+                ModFolder = Txtbox_ModFolder.Text;
             }
             else
             {
@@ -193,6 +194,7 @@ namespace FS22_ModManagerCore
             if (Selectbox_GameSave.SelectedIndex == 0)
             {
                 ListMods.ByModFolder(ModFolder);
+                
             }
             else
             {
