@@ -31,16 +31,23 @@ namespace FS22_ModManagerCore
         {
             InitializeComponent();
             Selectbox_GameSave.SelectedIndex = 0;
+            //Preliminary check for game installation status.
+            //Per-Button active will have more detail check with ExCode.
+            if (!Directory.Exists(UserDocumentFolder + "/My Games/FarmingSimulator2022"))
+            {
+                MessageBox.Show("You must install and run Farming Simulator 22 at least once before using this Mod Manager!\r\n\nThe Mod Manager will now exit.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Environment.Exit(0);
+            }
         }
         
         /*
             *
-            *
+            *Control mod folder textbox, GetModFolder and Lock(Unlock)ModFolder button.
             *
         */
         #region Get & Lock Mod Folder
         //
-        //
+        //Click a button to get the game mod folder from "gameSettings.xml"
         //
         private void Btn_GetModFolder_Click(object sender, EventArgs e)
         {
@@ -66,7 +73,7 @@ namespace FS22_ModManagerCore
         }
         
         //
-        //
+        //Using XmlDocument to read "gameSettings.xml" and extract the mod folder
         //
         public static string GetModFolder(string GameDatatFolder, string GameSettingXMLpath)
         {
@@ -75,6 +82,7 @@ namespace FS22_ModManagerCore
             gameSetting.Load(GameSettingXMLpath);
             XmlNode node = gameSetting.DocumentElement.SelectSingleNode("/gameSettings/modsDirectoryOverride");
             string IsCustomActive = node.Attributes["active"].InnerText;
+            //Situation: Default mod folder
             if (IsCustomActive == "false")
             {
                 ReturnFolder = GameDatatFolder + "/mods";
@@ -83,6 +91,7 @@ namespace FS22_ModManagerCore
                 //Process.Start("explorer.exe", @PathConvert(ReturnFolder));    //DEBUG ONLY
                 return @PathConvert(ReturnFolder);
             }
+            //Situation: Custom mod folder
             else
             {
                 string CustomFolder = node.Attributes["directory"].InnerText;
@@ -95,25 +104,42 @@ namespace FS22_ModManagerCore
         }
         
         //
-        //
+        //LockModFolder button interlock and text change.
         //
         private void Btn_LockModFolder_Click(object sender, EventArgs e)
         {
-            if (Txtbox_ModFolder.Enabled == true || Selectbox_GameSave.Enabled == false)
+            if (Txtbox_ModFolder.Enabled == true && Selectbox_GameSave.Enabled == true)
             {
-                Btn_GetModFolder.Enabled = false;
-                Txtbox_ModFolder.Enabled = false;
-                ModFolder = Txtbox_ModFolder.Text;
+                //Check validity for textbox folder in case of custom input.
+                //Any folder does not exists or not a folder at all will return false (go else).
+                if (Directory.Exists(Txtbox_ModFolder.Text))
+                {
+                    Btn_GetModFolder.Enabled = false;
+                    Txtbox_ModFolder.Enabled = false;
+                    ModFolder = Txtbox_ModFolder.Text;  //Override ModFolder from the textbox in case of user did a custom input.
+                    Btn_LockModFolder.Text = "Unlock Folder";
+                }
+                else
+                {
+                    //This MessageBox is now expired, replaced by LockGameSave button interlock.
+                    MessageBox.Show("The folder in the textbox doesn't exists or not validate!");
+                }
+            }
+            else if (Txtbox_ModFolder.Enabled == false && Selectbox_GameSave.Enabled == false)
+            {
+                MessageBox.Show("You need to unlock the game save first!");
             }
             else
             {
                 Btn_GetModFolder.Enabled = true;
                 Txtbox_ModFolder.Enabled = true;
+                Btn_LockModFolder.Text = "Lock Mod Folder";
             }
         }
         
         //
-        //
+        //Interlock between textbox and LockModFolder button.
+        //If the textbox is empty, means there is no folder to lock.
         //
         private void Txtbox_ModFolder_TextChanged(object sender, EventArgs e)
         {
@@ -126,20 +152,20 @@ namespace FS22_ModManagerCore
                 Btn_LockModFolder.Enabled = false;
             }
         }
-        #endregion
         
         //
-        //
+        //Convert all “/” to “\” in any path strings, so the system can read those correctly.
         //
         public static string PathConvert(string PathNeedConvert)
         {
             string PathConverted = PathNeedConvert.Replace("/", @"\");
             return PathConverted;
         }
+        #endregion
         
         /*
             *
-            *
+            *Control Lock(Unlock)GameSave button; Unlock Folder and Read Now button usability.
             *
         */
         #region Set & Lock GameSave File
@@ -150,6 +176,7 @@ namespace FS22_ModManagerCore
         {
             if (Selectbox_GameSave.Enabled == true && Btn_GetModFolder.Enabled == false)
             {
+                //A game save has been selected.
                 if (Selectbox_GameSave.SelectedIndex != 0)
                 {
                     GameSaveXMLpath = GameDatatFolder + "/savegame" + Selectbox_GameSave.SelectedIndex + "/careerSavegame.xml";
@@ -157,6 +184,8 @@ namespace FS22_ModManagerCore
                     if (File.Exists(GameSaveXMLpath))
                     {
                         Selectbox_GameSave.Enabled = false;
+                        Btn_LockGameSave.Text = "Unlock Save";
+                        Btn_LockModFolder.Enabled = false;
                         Btn_ReadNow.Enabled = true;
                     }
                     else
@@ -165,9 +194,12 @@ namespace FS22_ModManagerCore
                         MessageBox.Show("Gamesave doesn't exist! ExCode: 1003");
                     }
                 }
+                //Continue without game save.
                 else
                 {
                     Selectbox_GameSave.Enabled = false;
+                    Btn_LockGameSave.Text = "Unlock Save";
+                    Btn_LockModFolder.Enabled = false;
                     Btn_ReadNow.Enabled = true;
                 }
             }
@@ -175,6 +207,8 @@ namespace FS22_ModManagerCore
             {
                 GameSaveXMLpath = "";
                 Selectbox_GameSave.Enabled = true;
+                Btn_LockGameSave.Text = "Lock Game Save";
+                Btn_LockModFolder.Enabled = true;
                 Btn_ReadNow.Enabled = false;
             }
             else

@@ -18,7 +18,7 @@ namespace FS22_ModManagerCore
             ZipPathList = Directory.GetFiles(ModFolder, "*.zip", SearchOption.TopDirectoryOnly);
             int ZipPathListSize = ZipPathList.Length;
             MessageBox.Show(Convert.ToString(ZipPathListSize));
-            var ModInfoList = new List<ModInfoList>();
+            var ModInfoList = new List<ModInfo>();
             for (int i = 0; i < ZipPathListSize; i++)
             {
                 using (ZipArchive ZipFileContent = ZipFile.OpenRead(@ZipPathList[i]))
@@ -86,7 +86,15 @@ namespace FS22_ModManagerCore
                             {
                                 XmlNode MVersion = ModDesc.DocumentElement.SelectSingleNode("/modDesc");
                                 int Version = Convert.ToInt16(MVersion.Attributes["descVersion"].InnerText);
-                                
+                                //XmlNode MRealName = ;
+                                ModInfoList.Add(new ModInfo
+                                {
+                                    ZipFileName = Path.GetFileName(@ZipPathList[i]),
+                                    ModRealName = "",
+                                    ModStatus = "",
+                                    CrossCheck = "",
+                                    ZipPath = @ZipPathList[i],
+                                });
                                 //MessageBox.Show(@ZipPathList[i] + Version);         //DEBUG ONLY
                                 //if (i == ZipPathListSize - 1)                       //.
                                 //{                                                   //.
@@ -113,7 +121,7 @@ namespace FS22_ModManagerCore
         }
     }
     
-    public class ModInfoList
+    public class ModInfo
     {
         public string ZipFileName   { get; set; }   //Use to reload the zip file content when need
         public string ModRealName   { get; set; }   //Use to display name in Listbox (read modDesc)
