@@ -3,9 +3,6 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
-# Move2win custom rules
-!*.csproj.user
-
 # User-specific files
 *.rsuser
 *.suo
@@ -399,3 +396,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# Move2win custom rules
+!*.csproj.user
