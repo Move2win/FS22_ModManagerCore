@@ -26,7 +26,8 @@ namespace FS22_ModManagerCore
         public string GameSettingXMLpath;
         public string ModFolder;
         public string GameSaveXMLpath;
-        
+        public int    CurrentDescVersion;  //PosInt for valid CurrentDescVersion, "-1" for DecVersion unavailable. Pass to class ListMods.
+
         public MainWindow()
         {
             InitializeComponent();
@@ -37,6 +38,25 @@ namespace FS22_ModManagerCore
             {
                 MessageBox.Show("You must install and run Farming Simulator 22 at least once before using this Mod Manager!\r\n\nThe Mod Manager will now exit.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 Environment.Exit(0);
+            }
+            //Try to get the current game modDesc version.
+            if (File.Exists(UserDocumentFolder + "/My Games/FarmingSimulator2022/log.txt"))
+            {
+                var LogFile = File.ReadLines(UserDocumentFolder + "/My Games/FarmingSimulator2022/log.txt");
+                foreach (var Line in LogFile)
+                {
+                    if (Line.Contains("ModDesc Version"))
+                    {
+                        CurrentDescVersion = Convert.ToInt32(Line[^2..]);  //IDE0057: Substring(Line.Length - 2), read last 2 number in that line.
+                        MessageBox.Show("CurrentDescVersion: " + CurrentDescVersion); //DEBUG ONLY
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Failed to get CurrentDescVersion from log.txt. Mod update status check will be unavailable at this time.\r\n\nRun the game once and re-open this manager to try again.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                CurrentDescVersion = -1;   //DecVersion unavailable
             }
         }
         
@@ -227,12 +247,12 @@ namespace FS22_ModManagerCore
         {
             if (Selectbox_GameSave.SelectedIndex == 0)
             {
-                ListMods.ByModFolder(ModFolder);
-                
+                List<List<string>> ModInfoList = ListMods.ByModFolder(ModFolder, CurrentDescVersion);
+                string a = ModInfoList[0][0];
             }
             else
             {
-                ListMods.ByGameSave(GameSaveXMLpath);
+                ListMods.ByGameSave(GameSaveXMLpath, CurrentDescVersion);
             }
         }
     }

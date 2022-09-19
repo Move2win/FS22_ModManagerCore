@@ -5,8 +5,5 @@
     <Compile Update="MainWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="ListMods.cs">
-      <SubType>Class</SubType>
-    </Compile>
   </ItemGroup>
 </Project>
