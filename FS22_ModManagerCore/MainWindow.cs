@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
@@ -381,5 +382,15 @@ namespace FS22_ModManagerCore
             }
         }
         #endregion
+        
+        private void GithubLink_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            ProcessStartInfo OpenGithub = new()
+            {
+                FileName = "https://github.com/Move2win/FS22_ModManagerCore",
+                UseShellExecute = true
+            };
+            Process.Start(OpenGithub);
+        }
     }
 }

@@ -29,7 +29,6 @@ namespace FS22_ModManagerCore
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.Btn_GetModFolder = new System.Windows.Forms.Button();
             this.Btn_LockModFolder = new System.Windows.Forms.Button();
             this.Txtbox_ModFolder = new System.Windows.Forms.TextBox();
@@ -41,6 +40,7 @@ namespace FS22_ModManagerCore
             this.ModFileNameHeader = new System.Windows.Forms.ColumnHeader();
             this.Picbox_ModPicture = new System.Windows.Forms.PictureBox();
             this.Txtbox_ModInfoDisplay = new System.Windows.Forms.TextBox();
+            this.GithubLink = new System.Windows.Forms.LinkLabel();
             ((System.ComponentModel.ISupportInitialize)(this.Picbox_ModPicture)).BeginInit();
             this.SuspendLayout();
             // 
@@ -168,11 +168,28 @@ namespace FS22_ModManagerCore
             this.Txtbox_ModInfoDisplay.Size = new System.Drawing.Size(311, 492);
             this.Txtbox_ModInfoDisplay.TabIndex = 8;
             // 
+            // GithubLink
+            // 
+            this.GithubLink.ActiveLinkColor = System.Drawing.Color.DeepSkyBlue;
+            this.GithubLink.AutoSize = true;
+            this.GithubLink.Font = new System.Drawing.Font("Microsoft YaHei UI", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.GithubLink.LinkColor = System.Drawing.Color.DeepSkyBlue;
+            this.GithubLink.Location = new System.Drawing.Point(832, 10);
+            this.GithubLink.Name = "GithubLink";
+            this.GithubLink.Size = new System.Drawing.Size(322, 70);
+            this.GithubLink.TabIndex = 9;
+            this.GithubLink.TabStop = true;
+            this.GithubLink.Text = "View on Github for\r\nupdates and bug report";
+            this.GithubLink.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.GithubLink.VisitedLinkColor = System.Drawing.Color.DeepSkyBlue;
+            this.GithubLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.GithubLink_LinkClicked);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(1264, 681);
+            this.Controls.Add(this.GithubLink);
             this.Controls.Add(this.Txtbox_ModInfoDisplay);
             this.Controls.Add(this.Picbox_ModPicture);
             this.Controls.Add(this.Lst_ModList);
@@ -206,6 +223,7 @@ namespace FS22_ModManagerCore
         public System.Windows.Forms.TextBox Txtbox_ModInfoDisplay;
         private System.Windows.Forms.ColumnHeader ModFileNameHeader;
         private System.Windows.Forms.ColumnHeader ModRealNameHeader;
+        private System.Windows.Forms.LinkLabel GithubLink;
     }
 }
 
