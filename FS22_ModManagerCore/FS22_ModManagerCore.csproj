@@ -4,7 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
-    <IsPublishable>False</IsPublishable>
+    <IsPublishable>True</IsPublishable>
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
     <AnalysisLevel>6.0-all</AnalysisLevel>
     <ErrorReport>none</ErrorReport>
