@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FS22_ModManagerCore": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}

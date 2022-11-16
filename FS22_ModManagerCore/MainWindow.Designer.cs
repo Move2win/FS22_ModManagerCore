@@ -37,9 +37,11 @@ namespace FS22_ModManagerCore
             this.Btn_ReadNow = new System.Windows.Forms.Button();
             this.Selectbox_GameSave = new System.Windows.Forms.ComboBox();
             this.Lst_ModList = new System.Windows.Forms.ListView();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.ModRealNameHeader = new System.Windows.Forms.ColumnHeader();
+            this.ModFileNameHeader = new System.Windows.Forms.ColumnHeader();
+            this.Picbox_ModPicture = new System.Windows.Forms.PictureBox();
             this.Txtbox_ModInfoDisplay = new System.Windows.Forms.TextBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Picbox_ModPicture)).BeginInit();
             this.SuspendLayout();
             // 
             // Btn_GetModFolder
@@ -124,26 +126,45 @@ namespace FS22_ModManagerCore
             // 
             // Lst_ModList
             // 
-            this.Lst_ModList.HideSelection = false;
+            this.Lst_ModList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.ModRealNameHeader,
+            this.ModFileNameHeader});
+            this.Lst_ModList.FullRowSelect = true;
+            this.Lst_ModList.GridLines = true;
             this.Lst_ModList.Location = new System.Drawing.Point(760, 93);
             this.Lst_ModList.Name = "Lst_ModList";
             this.Lst_ModList.Size = new System.Drawing.Size(466, 576);
             this.Lst_ModList.TabIndex = 6;
             this.Lst_ModList.UseCompatibleStateImageBehavior = false;
+            this.Lst_ModList.View = System.Windows.Forms.View.Details;
+            this.Lst_ModList.SelectedIndexChanged += new System.EventHandler(this.Lst_ModList_SelectedIndexChanged);
             // 
-            // pictureBox1
+            // ModRealNameHeader
             // 
-            this.pictureBox1.Location = new System.Drawing.Point(51, 234);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(270, 270);
-            this.pictureBox1.TabIndex = 7;
-            this.pictureBox1.TabStop = false;
+            this.ModRealNameHeader.Text = "Mod Name";
+            this.ModRealNameHeader.Width = 223;
+            // 
+            // ModFileNameHeader
+            // 
+            this.ModFileNameHeader.Text = "Zip File Name";
+            this.ModFileNameHeader.Width = 222;
+            // 
+            // Picbox_ModPicture
+            // 
+            this.Picbox_ModPicture.Location = new System.Drawing.Point(51, 234);
+            this.Picbox_ModPicture.Name = "Picbox_ModPicture";
+            this.Picbox_ModPicture.Size = new System.Drawing.Size(270, 270);
+            this.Picbox_ModPicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.Picbox_ModPicture.TabIndex = 7;
+            this.Picbox_ModPicture.TabStop = false;
             // 
             // Txtbox_ModInfoDisplay
             // 
+            this.Txtbox_ModInfoDisplay.BackColor = System.Drawing.SystemColors.ControlLightLight;
             this.Txtbox_ModInfoDisplay.Location = new System.Drawing.Point(394, 177);
             this.Txtbox_ModInfoDisplay.Multiline = true;
             this.Txtbox_ModInfoDisplay.Name = "Txtbox_ModInfoDisplay";
+            this.Txtbox_ModInfoDisplay.ReadOnly = true;
             this.Txtbox_ModInfoDisplay.Size = new System.Drawing.Size(311, 492);
             this.Txtbox_ModInfoDisplay.TabIndex = 8;
             // 
@@ -153,7 +174,7 @@ namespace FS22_ModManagerCore
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(1264, 681);
             this.Controls.Add(this.Txtbox_ModInfoDisplay);
-            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.Picbox_ModPicture);
             this.Controls.Add(this.Lst_ModList);
             this.Controls.Add(this.Selectbox_GameSave);
             this.Controls.Add(this.Btn_LockGameSave);
@@ -161,12 +182,12 @@ namespace FS22_ModManagerCore
             this.Controls.Add(this.Txtbox_ModFolder);
             this.Controls.Add(this.Btn_LockModFolder);
             this.Controls.Add(this.Btn_GetModFolder);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Icon = Properties.Resources.Logo_Farming_Simulator_22;
             this.MaximizeBox = false;
             this.Name = "MainWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "FS22 Mod Manager Core";
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.Picbox_ModPicture)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -181,8 +202,10 @@ namespace FS22_ModManagerCore
         public System.Windows.Forms.Button Btn_LockGameSave;
         public System.Windows.Forms.Button Btn_ReadNow;
         public System.Windows.Forms.ListView Lst_ModList;
-        public System.Windows.Forms.PictureBox pictureBox1;
+        public System.Windows.Forms.PictureBox Picbox_ModPicture;
         public System.Windows.Forms.TextBox Txtbox_ModInfoDisplay;
+        private System.Windows.Forms.ColumnHeader ModFileNameHeader;
+        private System.Windows.Forms.ColumnHeader ModRealNameHeader;
     }
 }
 

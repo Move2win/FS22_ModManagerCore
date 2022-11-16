@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Xml;
+using Pfim;
+using ImageFormat = Pfim.ImageFormat;
 
 namespace FS22_ModManagerCore
 {
@@ -22,11 +25,13 @@ namespace FS22_ModManagerCore
         */
         //UserDocumentFolder => "C:\Users\%username%\Documents"
         readonly string UserDocumentFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        public string GameDatatFolder;
-        public string GameSettingXMLpath;
-        public string ModFolder;
-        public string GameSaveXMLpath;
-        public int    CurrentDescVersion;  //PosInt for valid CurrentDescVersion, "-1" for DecVersion unavailable. Pass to class ListMods.
+        private string  GameDatatFolder;
+        private string  GameSettingXMLpath;
+        private string  ModFolder;
+        private string  GameSaveXMLpath;
+        readonly int    CurrentDescVersion;  //PositiveInt for valid CurrentDescVersion, "-1" for DescVersion unavailable. Pass to class ListMods.
+        List<List<string>> ModInfoList;
+
 
         public MainWindow()
         {
@@ -42,13 +47,13 @@ namespace FS22_ModManagerCore
             //Try to get the current game modDesc version.
             if (File.Exists(UserDocumentFolder + "/My Games/FarmingSimulator2022/log.txt"))
             {
-                var LogFile = File.ReadLines(UserDocumentFolder + "/My Games/FarmingSimulator2022/log.txt");
+                IEnumerable<string> LogFile = File.ReadLines(UserDocumentFolder + "/My Games/FarmingSimulator2022/log.txt");
                 foreach (var Line in LogFile)
                 {
-                    if (Line.Contains("ModDesc Version"))
+                    if (Line.Contains("ModDesc Version", StringComparison.Ordinal))
                     {
-                        CurrentDescVersion = Convert.ToInt32(Line[^2..]);  //IDE0057: Substring(Line.Length - 2), read last 2 number in that line.
-                        MessageBox.Show("CurrentDescVersion: " + CurrentDescVersion); //DEBUG ONLY
+                        CurrentDescVersion = Convert.ToInt32(Line[^2..], new CultureInfo("en-us")); //IDE0057: Substring(Line.Length - 2), read last 2 number in line.
+                        //MessageBox.Show("CurrentDescVersion: " + CurrentDescVersion); //DEBUG ONLY
                         break;
                     }
                 }
@@ -56,7 +61,7 @@ namespace FS22_ModManagerCore
             else
             {
                 MessageBox.Show("Failed to get CurrentDescVersion from log.txt. Mod update status check will be unavailable at this time.\r\n\nRun the game once and re-open this manager to try again.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                CurrentDescVersion = -1;   //DecVersion unavailable
+                CurrentDescVersion = -1;   //DescVersion unavailable
             }
         }
         
@@ -102,7 +107,7 @@ namespace FS22_ModManagerCore
             gameSetting.Load(GameSettingXMLpath);
             XmlNode node = gameSetting.DocumentElement.SelectSingleNode("/gameSettings/modsDirectoryOverride");
             string IsCustomActive = node.Attributes["active"].InnerText;
-            //Situation: Default mod folder
+            //Case: Default mod folder
             if (IsCustomActive == "false")
             {
                 ReturnFolder = GameDatatFolder + "/mods";
@@ -111,11 +116,10 @@ namespace FS22_ModManagerCore
                 //Process.Start("explorer.exe", @PathConvert(ReturnFolder));    //DEBUG ONLY
                 return @PathConvert(ReturnFolder);
             }
-            //Situation: Custom mod folder
+            //Case: Custom mod folder
             else
             {
-                string CustomFolder = node.Attributes["directory"].InnerText;
-                ReturnFolder = CustomFolder;
+                ReturnFolder = node.Attributes["directory"].InnerText;
                 //MessageBox.Show("IsCustomActive = true, " + ReturnFolder);	//DEBUG ONLY
                 //Clipboard.SetText(ReturnFolder);                              //DEBUG ONLY
                 //Process.Start("explorer.exe", @PathConvert(ReturnFolder));	//DEBUG ONLY
@@ -131,7 +135,7 @@ namespace FS22_ModManagerCore
             if (Txtbox_ModFolder.Enabled == true && Selectbox_GameSave.Enabled == true)
             {
                 //Check validity for textbox folder in case of custom input.
-                //Any folder does not exists or not a folder at all will return false (go else).
+                //Any folder does not exists or not a folder at all will return false (goto else).
                 if (Directory.Exists(Txtbox_ModFolder.Text))
                 {
                     Btn_GetModFolder.Enabled = false;
@@ -141,7 +145,6 @@ namespace FS22_ModManagerCore
                 }
                 else
                 {
-                    //This MessageBox is now expired, replaced by LockGameSave button interlock.
                     MessageBox.Show("The folder in the textbox doesn't exists or not validate!");
                 }
             }
@@ -163,7 +166,7 @@ namespace FS22_ModManagerCore
         //
         private void Txtbox_ModFolder_TextChanged(object sender, EventArgs e)
         {
-            if (Txtbox_ModFolder.Text != "")
+            if (Txtbox_ModFolder.Text != null)
             {
                 Btn_LockModFolder.Enabled = true;
             }
@@ -178,7 +181,8 @@ namespace FS22_ModManagerCore
         //
         public static string PathConvert(string PathNeedConvert)
         {
-            string PathConverted = PathNeedConvert.Replace("/", @"\");
+            string PathConverted = null;
+            if (PathNeedConvert != null) { PathConverted = PathNeedConvert.Replace("/", @"\", StringComparison.Ordinal); }
             return PathConverted;
         }
         #endregion
@@ -189,9 +193,6 @@ namespace FS22_ModManagerCore
             *
         */
         #region Set & Lock GameSave File
-        //
-        //
-        //
         private void Btn_LockGameSave_Click(object sender, EventArgs e)
         {
             if (Selectbox_GameSave.Enabled == true && Btn_GetModFolder.Enabled == false)
@@ -200,7 +201,7 @@ namespace FS22_ModManagerCore
                 if (Selectbox_GameSave.SelectedIndex != 0)
                 {
                     GameSaveXMLpath = GameDatatFolder + "/savegame" + Selectbox_GameSave.SelectedIndex + "/careerSavegame.xml";
-                    MessageBox.Show(GameSaveXMLpath);
+                    MessageBox.Show("Warning: this option doesn't work right now. Please stick to \"Continue Without GameSave\" for now! I will do it at a later time.\r\n" + GameSaveXMLpath);
                     if (File.Exists(GameSaveXMLpath))
                     {
                         Selectbox_GameSave.Enabled = false;
@@ -210,7 +211,7 @@ namespace FS22_ModManagerCore
                     }
                     else
                     {
-                        GameSaveXMLpath = "";
+                        GameSaveXMLpath = null;
                         MessageBox.Show("Gamesave doesn't exist! ExCode: 1003");
                     }
                 }
@@ -240,20 +241,145 @@ namespace FS22_ModManagerCore
         
         /*
             *
+            *Read and display mod information and thumbnail.
             *
-            *
-        */ 
+        */
+        #region Read & Display Mod Info
+        //
+        //Trigger ListMods.cs to read all mod zip files and extract information into a List<List<String>>.
+        //Then display it on Lst_ModList.
+        //
         private void Btn_ReadNow_Click(object sender, EventArgs e)
         {
             if (Selectbox_GameSave.SelectedIndex == 0)
             {
-                List<List<string>> ModInfoList = ListMods.ByModFolder(ModFolder, CurrentDescVersion);
-                string a = ModInfoList[0][0];
+                Lst_ModList.Items.Clear();
+                Txtbox_ModInfoDisplay.Clear();
+                Picbox_ModPicture.Image = null;
+                ModInfoList = ListMods.ByModFolder(ModFolder, CurrentDescVersion);
+                ModInfoList = ModInfoList.OrderBy(x => x.FirstOrDefault()).ToList();
+                int ModCounts = ModInfoList.Count;
+                foreach (List<string> ModInfo in ModInfoList)
+                {
+                    /*
+                        * ModInfo[0] => RealName;
+                        * ModInfo[1] => ModVersion;
+                        * ModInfo[2] => ModCompatibility;
+                        * ModInfo[3] => Multiplayer;
+                        * ModInfo[4] => Path.GetFileName(@ZipPathList[i]);
+                        * ModInfo[5] => @ZipPathList[i];
+                        * ModInfo[6] => IconFileName
+                    */
+                    string ModRealName = ModInfo[0];
+                    string ModFileName = ModInfo[4].Replace(".zip", "", StringComparison.Ordinal);
+                    string[] ItemSet = {ModRealName, ModFileName };
+                    Lst_ModList.Items.Add(new ListViewItem(ItemSet));
+                }
             }
             else
             {
                 ListMods.ByGameSave(GameSaveXMLpath, CurrentDescVersion);
             }
         }
+        
+        //
+        //It will trigger when the Lst_ModList selection changes every time.
+        //It displays information from List<List<String>> into Txtbox_ModInfoDisplay and a thumbnail into Picbox_ModPicture, for the mod you selected in Lst_ModList.
+        //
+        private void Lst_ModList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int SelectIndex = Lst_ModList.FocusedItem.Index;
+            //MessageBox.Show(Convert.ToString(SelectIndex));
+            Txtbox_ModInfoDisplay.Text= "Mod Name: " + ModInfoList[SelectIndex][0] + "\r\n\r\n" + 
+                                        "Mod Version: " + ModInfoList[SelectIndex][1] + "\r\n\r\n" + 
+                                        "Compatibility: " + ModInfoList[SelectIndex][2] + "\r\n\r\n" + 
+                                        "Multiplayer: " + ModInfoList[SelectIndex][3] + "\r\n\r\n" + 
+                                        "Zip File Name: " + ModInfoList[SelectIndex][4] + "\r\n\r\n" + 
+                                        "Mod File Path: " + "\r\n" + ModInfoList[SelectIndex][5];
+            using (ZipArchive ZipFileContent = ZipFile.OpenRead(ModInfoList[SelectIndex][5]))
+            {
+                ZipArchiveEntry ImageEntry = ZipFileContent.GetEntry(ModInfoList[SelectIndex][6]);
+                Stream ImageStream = null;
+                Bitmap bitmap;
+                bool ImageStreamException = false;
+                bool PngFlag = true;
+                //MessageBox.Show("a");
+                try
+                {
+                    ImageStream = ImageEntry.Open();
+                }
+                catch (NullReferenceException)
+                {
+                    //MessageBox.Show(Convert.ToString(ex));
+                    //MessageBox.Show(ModInfoList[SelectIndex][6][..^4] + ".dds");
+                    PngFlag = false;
+                    ImageEntry = ZipFileContent.GetEntry(ModInfoList[SelectIndex][6][..^4] + ".dds");
+                    try
+                    {
+                        ImageStream = ImageEntry.Open();
+                    }
+                    catch (NullReferenceException)
+                    {
+                        ImageStreamException = true;
+                        Picbox_ModPicture.Image = Properties.Resources.No_Image_Available;
+                    }
+                }
+                if (ModInfoList[SelectIndex][6][^3..] == "png" & PngFlag == true)
+                {
+                    try
+                    {
+                        bitmap = new(ImageStream);
+                        Picbox_ModPicture.Image = bitmap;
+                    }
+                    catch (ArgumentException)
+                    {
+                        Picbox_ModPicture.Image = Properties.Resources.No_Image_Available;
+                    }
+                }
+                else if (ImageStreamException == false)
+                {
+                    try
+                    {
+                        IImage image = Pfimage.FromStream(ImageStream);
+                        PixelFormat format;
+                        switch (image.Format)
+                        {
+                            case ImageFormat.Rgb24:
+                                format = PixelFormat.Format24bppRgb;
+                                break;
+                            case ImageFormat.Rgba32:
+                                format = PixelFormat.Format32bppArgb;
+                                break;
+                            case ImageFormat.R5g5b5:
+                                format = PixelFormat.Format16bppRgb555;
+                                break;
+                            case ImageFormat.R5g6b5:
+                                format = PixelFormat.Format16bppRgb565;
+                                break;
+                            case ImageFormat.R5g5b5a1:
+                                format = PixelFormat.Format16bppArgb1555;
+                                break;
+                            case ImageFormat.Rgb8:
+                                format = PixelFormat.Format8bppIndexed;
+                                break;
+                            default:
+                                var msg = $"{image.Format} is not recognized for Bitmap on Windows Forms. " +
+                                        "You'd need to write a conversion function to convert the data to known format";
+                                var caption = "Unrecognized format";
+                                MessageBox.Show(msg, caption, MessageBoxButtons.OK);
+                                return;
+                        }
+                        IntPtr ptr = Marshal.UnsafeAddrOfPinnedArrayElement(image.Data, 0);
+                        bitmap = new(image.Width, image.Height, image.Stride, format, ptr);
+                        Picbox_ModPicture.Image = bitmap;
+                    }
+                    catch (ArgumentException)
+                    {
+                        Picbox_ModPicture.Image = Properties.Resources.No_Image_Available;
+                    }
+                }
+            }
+        }
+        #endregion
     }
 }
