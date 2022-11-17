@@ -5,7 +5,7 @@ This software is currently under development, and will only support Windows10/11
 
 <del>Nothing is really functioning right now.</del>
 
-Update:
+<b>Update:</b>
 
 Preliminary functions have been established. It can now read mods' essential information for a quick check.
 
