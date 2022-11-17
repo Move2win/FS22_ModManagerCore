@@ -41,6 +41,8 @@ namespace FS22_ModManagerCore
             this.Picbox_ModPicture = new System.Windows.Forms.PictureBox();
             this.Txtbox_ModInfoDisplay = new System.Windows.Forms.TextBox();
             this.GithubLink = new System.Windows.Forms.LinkLabel();
+            this.Btn_OpenExplorer = new System.Windows.Forms.Button();
+            this.Btn_OpenFile = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.Picbox_ModPicture)).BeginInit();
             this.SuspendLayout();
             // 
@@ -151,9 +153,9 @@ namespace FS22_ModManagerCore
             // 
             // Picbox_ModPicture
             // 
-            this.Picbox_ModPicture.Location = new System.Drawing.Point(51, 234);
+            this.Picbox_ModPicture.Location = new System.Drawing.Point(51, 246);
             this.Picbox_ModPicture.Name = "Picbox_ModPicture";
-            this.Picbox_ModPicture.Size = new System.Drawing.Size(270, 270);
+            this.Picbox_ModPicture.Size = new System.Drawing.Size(270, 255);
             this.Picbox_ModPicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.Picbox_ModPicture.TabIndex = 7;
             this.Picbox_ModPicture.TabStop = false;
@@ -165,7 +167,7 @@ namespace FS22_ModManagerCore
             this.Txtbox_ModInfoDisplay.Multiline = true;
             this.Txtbox_ModInfoDisplay.Name = "Txtbox_ModInfoDisplay";
             this.Txtbox_ModInfoDisplay.ReadOnly = true;
-            this.Txtbox_ModInfoDisplay.Size = new System.Drawing.Size(311, 492);
+            this.Txtbox_ModInfoDisplay.Size = new System.Drawing.Size(311, 393);
             this.Txtbox_ModInfoDisplay.TabIndex = 8;
             // 
             // GithubLink
@@ -184,11 +186,35 @@ namespace FS22_ModManagerCore
             this.GithubLink.VisitedLinkColor = System.Drawing.Color.DeepSkyBlue;
             this.GithubLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.GithubLink_LinkClicked);
             // 
+            // Btn_OpenExplorer
+            // 
+            this.Btn_OpenExplorer.Enabled = false;
+            this.Btn_OpenExplorer.Location = new System.Drawing.Point(394, 609);
+            this.Btn_OpenExplorer.Name = "Btn_OpenExplorer";
+            this.Btn_OpenExplorer.Size = new System.Drawing.Size(140, 40);
+            this.Btn_OpenExplorer.TabIndex = 11;
+            this.Btn_OpenExplorer.Text = "Locate In Explorer";
+            this.Btn_OpenExplorer.UseVisualStyleBackColor = true;
+            this.Btn_OpenExplorer.Click += new System.EventHandler(this.Btn_OpenExplorer_Click);
+            // 
+            // Btn_OpenFile
+            // 
+            this.Btn_OpenFile.Enabled = false;
+            this.Btn_OpenFile.Location = new System.Drawing.Point(565, 609);
+            this.Btn_OpenFile.Name = "Btn_OpenFile";
+            this.Btn_OpenFile.Size = new System.Drawing.Size(140, 40);
+            this.Btn_OpenFile.TabIndex = 10;
+            this.Btn_OpenFile.Text = "Open Mod Zip File";
+            this.Btn_OpenFile.UseVisualStyleBackColor = true;
+            this.Btn_OpenFile.Click += new System.EventHandler(this.Btn_OpenFile_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(1264, 681);
+            this.Controls.Add(this.Btn_OpenExplorer);
+            this.Controls.Add(this.Btn_OpenFile);
             this.Controls.Add(this.GithubLink);
             this.Controls.Add(this.Txtbox_ModInfoDisplay);
             this.Controls.Add(this.Picbox_ModPicture);
@@ -199,7 +225,7 @@ namespace FS22_ModManagerCore
             this.Controls.Add(this.Txtbox_ModFolder);
             this.Controls.Add(this.Btn_LockModFolder);
             this.Controls.Add(this.Btn_GetModFolder);
-            this.Icon = Properties.Resources.Logo_Farming_Simulator_22;
+            this.Icon = global::FS22_ModManagerCore.Properties.Resources.Logo_Farming_Simulator_22;
             this.MaximizeBox = false;
             this.Name = "MainWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -224,6 +250,8 @@ namespace FS22_ModManagerCore
         private System.Windows.Forms.ColumnHeader ModFileNameHeader;
         private System.Windows.Forms.ColumnHeader ModRealNameHeader;
         private System.Windows.Forms.LinkLabel GithubLink;
+        public System.Windows.Forms.Button Btn_OpenExplorer;
+        public System.Windows.Forms.Button Btn_OpenFile;
     }
 }
 

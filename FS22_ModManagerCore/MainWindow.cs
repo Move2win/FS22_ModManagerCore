@@ -25,12 +25,13 @@ namespace FS22_ModManagerCore
             ! Except for "PathConvert(string PathNeedConvert)", that works for both folder and path
         */
         //UserDocumentFolder => "C:\Users\%username%\Documents"
-        readonly string UserDocumentFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        private string  GameDatatFolder;
-        private string  GameSettingXMLpath;
-        private string  ModFolder;
-        private string  GameSaveXMLpath;
-        readonly int    CurrentDescVersion;  //PositiveInt for valid CurrentDescVersion, "-1" for DescVersion unavailable. Pass to class ListMods.
+        readonly string  UserDocumentFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        private  string  GameDatatFolder;
+        private  string  GameSettingXMLpath;
+        private  string  ModFolder;
+        private  string  GameSaveXMLpath;
+        readonly  int    CurrentDescVersion;  //PositiveInt for valid CurrentDescVersion, "-1" for DescVersion unavailable. Pass to class ListMods.
+        private   int    SelectIndex;
         List<List<string>> ModInfoList;
 
 
@@ -289,7 +290,8 @@ namespace FS22_ModManagerCore
         //
         private void Lst_ModList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            int SelectIndex = Lst_ModList.FocusedItem.Index;
+            Btn_OpenExplorer.Enabled = Btn_OpenFile.Enabled = true;
+            SelectIndex = Lst_ModList.FocusedItem.Index;
             //MessageBox.Show(Convert.ToString(SelectIndex));
             Txtbox_ModInfoDisplay.Text= "Mod Name: " + ModInfoList[SelectIndex][0] + "\r\n\r\n" + 
                                         "Mod Version: " + ModInfoList[SelectIndex][1] + "\r\n\r\n" + 
@@ -380,6 +382,34 @@ namespace FS22_ModManagerCore
                     }
                 }
             }
+        }
+        #endregion
+        
+        /*
+            * 
+            *Use buttons to locate the selected files in explorer or open zip files using user default application.
+            * 
+        */
+        #region Locate & Open Mods Zip File
+        //
+        //Open explorer with file selected.
+        //
+        private void Btn_OpenExplorer_Click(object sender, EventArgs e)
+        {
+            Process.Start("explorer.exe", "/select," + ModInfoList[SelectIndex][5]);
+        }
+        
+        //
+        //Use user default application to open zip files.
+        //
+        private void Btn_OpenFile_Click(object sender, EventArgs e)
+        {
+            ProcessStartInfo OpenZip = new()
+            {
+                FileName = ModInfoList[SelectIndex][5],
+                UseShellExecute = true
+            };
+            Process.Start(OpenZip);
         }
         #endregion
         
