@@ -18,8 +18,7 @@ namespace FS22_ModManagerCore
             int NonModCount = 0;
             int ListIndex;
             //A set(array) of strings contains every .zip file in the mod path. Each path could be extracted using "@ZipPathList[Index]."
-            string[] ZipPathList;
-            ZipPathList = Directory.GetFiles(ModFolder, "*.zip", SearchOption.TopDirectoryOnly);    //Load path into ZipPathList[]
+            string[] ZipPathList = Directory.GetFiles(ModFolder, "*.zip", SearchOption.TopDirectoryOnly);    //Load path into ZipPathList[]
             int ZipPathListSize = ZipPathList.Length;   //Almost the total number of mods, but didn't remove the "non-mod .zip" count yet.
             //MessageBox.Show(Convert.ToString(ZipPathListSize, Culture)); //DEBUG ONLY
             //A two-dimensional list of strings contains mod info. It can be accessed by ModInfoList[Index1][Index2].
