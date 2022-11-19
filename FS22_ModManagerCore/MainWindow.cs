@@ -288,7 +288,7 @@ namespace FS22_ModManagerCore
         //It will trigger when the Lst_ModList selection changes every time.
         //It displays information from List<List<String>> into Txtbox_ModInfoDisplay and a thumbnail into Picbox_ModPicture, for the mod you selected in Lst_ModList.
         //
-        private void Lst_ModList_SelectedIndexChanged(object sender, EventArgs e)
+        private void Lst_ModList_Click(object sender, EventArgs e)
         {
             Btn_OpenExplorer.Enabled = Btn_OpenFile.Enabled = true;
             SelectIndex = Lst_ModList.FocusedItem.Index;

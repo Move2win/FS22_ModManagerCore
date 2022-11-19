@@ -139,7 +139,7 @@ namespace FS22_ModManagerCore
             this.Lst_ModList.TabIndex = 6;
             this.Lst_ModList.UseCompatibleStateImageBehavior = false;
             this.Lst_ModList.View = System.Windows.Forms.View.Details;
-            this.Lst_ModList.SelectedIndexChanged += new System.EventHandler(this.Lst_ModList_SelectedIndexChanged);
+            this.Lst_ModList.Click += new System.EventHandler(this.Lst_ModList_Click);
             // 
             // ModRealNameHeader
             // 
