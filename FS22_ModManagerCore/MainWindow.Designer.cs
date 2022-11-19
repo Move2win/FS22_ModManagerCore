@@ -1,4 +1,6 @@
 ﻿
+using System.Windows.Forms;
+
 namespace FS22_ModManagerCore
 {
     partial class MainWindow
@@ -22,7 +24,7 @@ namespace FS22_ModManagerCore
         }
         
         #region Windows Form Designer generated code
-
+        
         /// <summary>
         ///  Required method for Designer support - do not modify
         ///  the contents of this method with the code editor.
@@ -43,7 +45,17 @@ namespace FS22_ModManagerCore
             this.GithubLink = new System.Windows.Forms.LinkLabel();
             this.Btn_OpenExplorer = new System.Windows.Forms.Button();
             this.Btn_OpenFile = new System.Windows.Forms.Button();
+            this.Gpb_SortingMethod = new System.Windows.Forms.GroupBox();
+            this.Rad_ByFileSize = new System.Windows.Forms.RadioButton();
+            this.Rad_ByLastModif = new System.Windows.Forms.RadioButton();
+            this.Rad_ByFileName = new System.Windows.Forms.RadioButton();
+            this.Rad_ByModName = new System.Windows.Forms.RadioButton();
+            this.Gpb_Ssquence = new System.Windows.Forms.GroupBox();
+            this.Rad_Descending = new System.Windows.Forms.RadioButton();
+            this.Rad_Ascending = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.Picbox_ModPicture)).BeginInit();
+            this.Gpb_SortingMethod.SuspendLayout();
+            this.Gpb_Ssquence.SuspendLayout();
             this.SuspendLayout();
             // 
             // Btn_GetModFolder
@@ -133,9 +145,9 @@ namespace FS22_ModManagerCore
             this.ModFileNameHeader});
             this.Lst_ModList.FullRowSelect = true;
             this.Lst_ModList.GridLines = true;
-            this.Lst_ModList.Location = new System.Drawing.Point(760, 93);
+            this.Lst_ModList.Location = new System.Drawing.Point(760, 135);
             this.Lst_ModList.Name = "Lst_ModList";
-            this.Lst_ModList.Size = new System.Drawing.Size(466, 576);
+            this.Lst_ModList.Size = new System.Drawing.Size(466, 534);
             this.Lst_ModList.TabIndex = 6;
             this.Lst_ModList.UseCompatibleStateImageBehavior = false;
             this.Lst_ModList.View = System.Windows.Forms.View.Details;
@@ -163,11 +175,11 @@ namespace FS22_ModManagerCore
             // Txtbox_ModInfoDisplay
             // 
             this.Txtbox_ModInfoDisplay.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.Txtbox_ModInfoDisplay.Location = new System.Drawing.Point(394, 177);
+            this.Txtbox_ModInfoDisplay.Location = new System.Drawing.Point(393, 167);
             this.Txtbox_ModInfoDisplay.Multiline = true;
             this.Txtbox_ModInfoDisplay.Name = "Txtbox_ModInfoDisplay";
             this.Txtbox_ModInfoDisplay.ReadOnly = true;
-            this.Txtbox_ModInfoDisplay.Size = new System.Drawing.Size(311, 393);
+            this.Txtbox_ModInfoDisplay.Size = new System.Drawing.Size(312, 412);
             this.Txtbox_ModInfoDisplay.TabIndex = 8;
             // 
             // GithubLink
@@ -176,7 +188,7 @@ namespace FS22_ModManagerCore
             this.GithubLink.AutoSize = true;
             this.GithubLink.Font = new System.Drawing.Font("Microsoft YaHei UI", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.GithubLink.LinkColor = System.Drawing.Color.DeepSkyBlue;
-            this.GithubLink.Location = new System.Drawing.Point(832, 10);
+            this.GithubLink.Location = new System.Drawing.Point(25, 579);
             this.GithubLink.Name = "GithubLink";
             this.GithubLink.Size = new System.Drawing.Size(322, 70);
             this.GithubLink.TabIndex = 9;
@@ -189,7 +201,7 @@ namespace FS22_ModManagerCore
             // Btn_OpenExplorer
             // 
             this.Btn_OpenExplorer.Enabled = false;
-            this.Btn_OpenExplorer.Location = new System.Drawing.Point(394, 609);
+            this.Btn_OpenExplorer.Location = new System.Drawing.Point(393, 609);
             this.Btn_OpenExplorer.Name = "Btn_OpenExplorer";
             this.Btn_OpenExplorer.Size = new System.Drawing.Size(140, 40);
             this.Btn_OpenExplorer.TabIndex = 11;
@@ -208,11 +220,102 @@ namespace FS22_ModManagerCore
             this.Btn_OpenFile.UseVisualStyleBackColor = true;
             this.Btn_OpenFile.Click += new System.EventHandler(this.Btn_OpenFile_Click);
             // 
+            // Gpb_SortingMethod
+            // 
+            this.Gpb_SortingMethod.Controls.Add(this.Rad_ByFileSize);
+            this.Gpb_SortingMethod.Controls.Add(this.Rad_ByLastModif);
+            this.Gpb_SortingMethod.Controls.Add(this.Rad_ByFileName);
+            this.Gpb_SortingMethod.Controls.Add(this.Rad_ByModName);
+            this.Gpb_SortingMethod.Location = new System.Drawing.Point(760, 23);
+            this.Gpb_SortingMethod.Name = "Gpb_SortingMethod";
+            this.Gpb_SortingMethod.Size = new System.Drawing.Size(285, 106);
+            this.Gpb_SortingMethod.TabIndex = 12;
+            this.Gpb_SortingMethod.TabStop = false;
+            this.Gpb_SortingMethod.Text = "Sorting Method";
+            // 
+            // Rad_ByFileSize
+            // 
+            this.Rad_ByFileSize.AutoSize = true;
+            this.Rad_ByFileSize.Location = new System.Drawing.Point(155, 65);
+            this.Rad_ByFileSize.Name = "Rad_ByFileSize";
+            this.Rad_ByFileSize.Size = new System.Drawing.Size(90, 21);
+            this.Rad_ByFileSize.TabIndex = 0;
+            this.Rad_ByFileSize.TabStop = true;
+            this.Rad_ByFileSize.Text = "By File Size";
+            this.Rad_ByFileSize.UseVisualStyleBackColor = true;
+            // 
+            // Rad_ByLastModif
+            // 
+            this.Rad_ByLastModif.AutoSize = true;
+            this.Rad_ByLastModif.Location = new System.Drawing.Point(27, 65);
+            this.Rad_ByLastModif.Name = "Rad_ByLastModif";
+            this.Rad_ByLastModif.Size = new System.Drawing.Size(106, 21);
+            this.Rad_ByLastModif.TabIndex = 0;
+            this.Rad_ByLastModif.TabStop = true;
+            this.Rad_ByLastModif.Text = "By Last Modif";
+            this.Rad_ByLastModif.UseVisualStyleBackColor = true;
+            // 
+            // Rad_ByFileName
+            // 
+            this.Rad_ByFileName.Location = new System.Drawing.Point(155, 30);
+            this.Rad_ByFileName.Name = "Rad_ByFileName";
+            this.Rad_ByFileName.Size = new System.Drawing.Size(102, 21);
+            this.Rad_ByFileName.TabIndex = 0;
+            this.Rad_ByFileName.TabStop = true;
+            this.Rad_ByFileName.Text = "By File Name";
+            this.Rad_ByFileName.UseVisualStyleBackColor = true;
+            // 
+            // Rad_ByModName
+            // 
+            this.Rad_ByModName.AutoSize = true;
+            this.Rad_ByModName.Location = new System.Drawing.Point(27, 30);
+            this.Rad_ByModName.Name = "Rad_ByModName";
+            this.Rad_ByModName.Size = new System.Drawing.Size(111, 21);
+            this.Rad_ByModName.TabIndex = 0;
+            this.Rad_ByModName.TabStop = true;
+            this.Rad_ByModName.Text = "By Mod Name";
+            this.Rad_ByModName.UseVisualStyleBackColor = true;
+            // 
+            // Gpb_Ssquence
+            // 
+            this.Gpb_Ssquence.Controls.Add(this.Rad_Descending);
+            this.Gpb_Ssquence.Controls.Add(this.Rad_Ascending);
+            this.Gpb_Ssquence.Location = new System.Drawing.Point(1051, 23);
+            this.Gpb_Ssquence.Name = "Gpb_Ssquence";
+            this.Gpb_Ssquence.Size = new System.Drawing.Size(175, 106);
+            this.Gpb_Ssquence.TabIndex = 13;
+            this.Gpb_Ssquence.TabStop = false;
+            this.Gpb_Ssquence.Text = "Sequence";
+            // 
+            // Rad_Descending
+            // 
+            this.Rad_Descending.AutoSize = true;
+            this.Rad_Descending.Location = new System.Drawing.Point(36, 65);
+            this.Rad_Descending.Name = "Rad_Descending";
+            this.Rad_Descending.Size = new System.Drawing.Size(94, 21);
+            this.Rad_Descending.TabIndex = 0;
+            this.Rad_Descending.TabStop = true;
+            this.Rad_Descending.Text = "Descending";
+            this.Rad_Descending.UseVisualStyleBackColor = true;
+            // 
+            // Rad_Ascending
+            // 
+            this.Rad_Ascending.AutoSize = true;
+            this.Rad_Ascending.Location = new System.Drawing.Point(36, 30);
+            this.Rad_Ascending.Name = "Rad_Ascending";
+            this.Rad_Ascending.Size = new System.Drawing.Size(86, 21);
+            this.Rad_Ascending.TabIndex = 0;
+            this.Rad_Ascending.TabStop = true;
+            this.Rad_Ascending.Text = "Ascending";
+            this.Rad_Ascending.UseVisualStyleBackColor = true;
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(1264, 681);
+            this.Controls.Add(this.Gpb_Ssquence);
+            this.Controls.Add(this.Gpb_SortingMethod);
             this.Controls.Add(this.Btn_OpenExplorer);
             this.Controls.Add(this.Btn_OpenFile);
             this.Controls.Add(this.GithubLink);
@@ -231,11 +334,15 @@ namespace FS22_ModManagerCore
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "FS22 Mod Manager Core";
             ((System.ComponentModel.ISupportInitialize)(this.Picbox_ModPicture)).EndInit();
+            this.Gpb_SortingMethod.ResumeLayout(false);
+            this.Gpb_SortingMethod.PerformLayout();
+            this.Gpb_Ssquence.ResumeLayout(false);
+            this.Gpb_Ssquence.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
-
+        
         #endregion
         
         public System.Windows.Forms.TextBox Txtbox_ModFolder;
@@ -252,6 +359,14 @@ namespace FS22_ModManagerCore
         private System.Windows.Forms.LinkLabel GithubLink;
         public System.Windows.Forms.Button Btn_OpenExplorer;
         public System.Windows.Forms.Button Btn_OpenFile;
+        private System.Windows.Forms.GroupBox Gpb_SortingMethod;
+        private System.Windows.Forms.RadioButton Rad_ByFileSize;
+        private System.Windows.Forms.RadioButton Rad_ByLastModif;
+        private System.Windows.Forms.RadioButton Rad_ByFileName;
+        private System.Windows.Forms.RadioButton Rad_ByModName;
+        private System.Windows.Forms.GroupBox Gpb_Ssquence;
+        private System.Windows.Forms.RadioButton Rad_Descending;
+        private System.Windows.Forms.RadioButton Rad_Ascending;
     }
 }
 

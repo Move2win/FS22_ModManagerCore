@@ -33,12 +33,15 @@ namespace FS22_ModManagerCore
         readonly  int    CurrentDescVersion;  //PositiveInt for valid CurrentDescVersion, "-1" for DescVersion unavailable. Pass to class ListMods.
         private   int    SelectIndex;
         List<List<string>> ModInfoList;
+        readonly CultureInfo Culture = new("en-us");
 
 
         public MainWindow()
         {
             InitializeComponent();
             Selectbox_GameSave.SelectedIndex = 0;
+            Rad_ByModName.Select();
+            Rad_Ascending.Select();
             //Preliminary check for game installation status.
             //Per-Button active will have more detail check with ExCode.
             if (!Directory.Exists(UserDocumentFolder + "/My Games/FarmingSimulator2022"))
@@ -54,7 +57,7 @@ namespace FS22_ModManagerCore
                 {
                     if (Line.Contains("ModDesc Version", StringComparison.Ordinal))
                     {
-                        CurrentDescVersion = Convert.ToInt32(Line[^2..], new CultureInfo("en-us")); //IDE0057: Substring(Line.Length - 2), read last 2 number in line.
+                        CurrentDescVersion = Convert.ToInt32(Line[^2..], Culture); //IDE0057: Substring(Line.Length - 2), read last 2 number in line.
                         //MessageBox.Show("CurrentDescVersion: " + CurrentDescVersion); //DEBUG ONLY
                         break;
                     }
@@ -257,9 +260,54 @@ namespace FS22_ModManagerCore
             {
                 Lst_ModList.Items.Clear();
                 Txtbox_ModInfoDisplay.Clear();
+                Btn_OpenExplorer.Enabled = Btn_OpenFile.Enabled = false;
                 Picbox_ModPicture.Image = null;
                 ModInfoList = ListMods.ByModFolder(ModFolder, CurrentDescVersion);
-                ModInfoList = ModInfoList.OrderBy(x => x.FirstOrDefault()).ToList();
+                //Sorting list by certain element group
+                if (Rad_ByModName.Checked)
+                {
+                    if (Rad_Ascending.Checked)
+                    {
+                        ModInfoList = ModInfoList.OrderBy(x => x.ElementAt(0)).ToList();
+                    }
+                    else
+                    {
+                        ModInfoList = ModInfoList.OrderByDescending(x => x.ElementAt(0)).ToList();
+                    }
+                }
+                else if (Rad_ByFileName.Checked)
+                {
+                    if (Rad_Ascending.Checked)
+                    {
+                        ModInfoList = ModInfoList.OrderBy(x => x.ElementAt(4)).ToList();
+                    }
+                    else
+                    {
+                        ModInfoList = ModInfoList.OrderByDescending(x => x.ElementAt(4)).ToList();
+                    }
+                }
+                else if (Rad_ByLastModif.Checked)
+                {
+                    if (Rad_Ascending.Checked)
+                    {
+                        ModInfoList = ModInfoList.OrderBy(x => Convert.ToDateTime(x.ElementAt(9), Culture)).ToList();
+                    }
+                    else
+                    {
+                        ModInfoList = ModInfoList.OrderByDescending(x => Convert.ToDateTime(x.ElementAt(9), Culture)).ToList();
+                    }
+                }
+                else
+                {
+                    if (Rad_Ascending.Checked)
+                    {
+                        ModInfoList = ModInfoList.OrderBy(x => Convert.ToInt64(x.ElementAt(7), Culture)).ToList();
+                    }
+                    else
+                    {
+                        ModInfoList = ModInfoList.OrderByDescending(x => Convert.ToInt64(x.ElementAt(7), Culture)).ToList();
+                    }
+                }
                 int ModCounts = ModInfoList.Count;
                 foreach (List<string> ModInfo in ModInfoList)
                 {
@@ -270,7 +318,10 @@ namespace FS22_ModManagerCore
                         * ModInfo[3] => Multiplayer;
                         * ModInfo[4] => Path.GetFileName(@ZipPathList[i]);
                         * ModInfo[5] => @ZipPathList[i];
-                        * ModInfo[6] => IconFileName
+                        * ModInfo[6] => IconFileName;
+                        * ModInfo[7] => FileSizeInMb;
+                        * ModInfo[8] => FileCreateTime;
+                        * ModInfo[9] => FileLastModifTime;
                     */
                     string ModRealName = ModInfo[0];
                     string ModFileName = ModInfo[4].Replace(".zip", "", StringComparison.Ordinal);
@@ -292,12 +343,28 @@ namespace FS22_ModManagerCore
         {
             Btn_OpenExplorer.Enabled = Btn_OpenFile.Enabled = true;
             SelectIndex = Lst_ModList.FocusedItem.Index;
-            //MessageBox.Show(Convert.ToString(SelectIndex));
-            Txtbox_ModInfoDisplay.Text= "Mod Name: " + ModInfoList[SelectIndex][0] + "\r\n\r\n" + 
-                                        "Mod Version: " + ModInfoList[SelectIndex][1] + "\r\n\r\n" + 
-                                        "Compatibility: " + ModInfoList[SelectIndex][2] + "\r\n\r\n" + 
-                                        "Multiplayer: " + ModInfoList[SelectIndex][3] + "\r\n\r\n" + 
-                                        "Zip File Name: " + ModInfoList[SelectIndex][4] + "\r\n\r\n" + 
+            string FileSizeConverted;
+            long FileSizeInt64 = Convert.ToInt64(ModInfoList[SelectIndex][7], Culture);
+            if(FileSizeInt64 < 1)
+            {
+                FileSizeConverted = "<1 MB";
+            }
+            else if (FileSizeInt64 >= 1 & FileSizeInt64 < 1024)
+            {
+                FileSizeConverted = ModInfoList[SelectIndex][7] + " MB";
+            }
+            else
+            {
+                FileSizeConverted = Convert.ToString(string.Format(Culture, "{0:.##}", FileSizeInt64 / 1024.00), Culture) + " GB";
+            }
+            Txtbox_ModInfoDisplay.Text= "Mod Name: "          + ModInfoList[SelectIndex][0] + "\r\n\r\n" + 
+                                        "Mod Version: "       + ModInfoList[SelectIndex][1] + "\r\n\r\n" +
+                                        "Compatibility: "     + ModInfoList[SelectIndex][2] + "\r\n\r\n" +
+                                        "Multiplayer: "       + ModInfoList[SelectIndex][3] + "\r\n\r\n" +
+                                        "File Size: "         + FileSizeConverted           + "\r\n\r\n" + 
+                                        "File Creation: "     + ModInfoList[SelectIndex][8] + "\r\n\r\n" + 
+                                        "Last Modification: " + ModInfoList[SelectIndex][9] + "\r\n\r\n" + 
+                                        "Zip File Name: "     + ModInfoList[SelectIndex][4] + "\r\n\r\n" + 
                                         "Mod File Path: " + "\r\n" + ModInfoList[SelectIndex][5];
             using (ZipArchive ZipFileContent = ZipFile.OpenRead(ModInfoList[SelectIndex][5]))
             {
@@ -306,14 +373,12 @@ namespace FS22_ModManagerCore
                 Bitmap bitmap;
                 bool ImageStreamException = false;
                 bool PngFlag = true;
-                //MessageBox.Show("a");
                 try
                 {
                     ImageStream = ImageEntry.Open();
                 }
                 catch (NullReferenceException)
                 {
-                    //MessageBox.Show(Convert.ToString(ex));
                     //MessageBox.Show(ModInfoList[SelectIndex][6][..^4] + ".dds");
                     PngFlag = false;
                     ImageEntry = ZipFileContent.GetEntry(ModInfoList[SelectIndex][6][..^4] + ".dds");
@@ -344,34 +409,41 @@ namespace FS22_ModManagerCore
                     try
                     {
                         IImage image = Pfimage.FromStream(ImageStream);
-                        PixelFormat format;
-                        switch (image.Format)
-                        {
-                            case ImageFormat.Rgb24:
-                                format = PixelFormat.Format24bppRgb;
-                                break;
-                            case ImageFormat.Rgba32:
-                                format = PixelFormat.Format32bppArgb;
-                                break;
-                            case ImageFormat.R5g5b5:
-                                format = PixelFormat.Format16bppRgb555;
-                                break;
-                            case ImageFormat.R5g6b5:
-                                format = PixelFormat.Format16bppRgb565;
-                                break;
-                            case ImageFormat.R5g5b5a1:
-                                format = PixelFormat.Format16bppArgb1555;
-                                break;
-                            case ImageFormat.Rgb8:
-                                format = PixelFormat.Format8bppIndexed;
-                                break;
-                            default:
-                                var msg = $"{image.Format} is not recognized for Bitmap on Windows Forms. " +
-                                        "You'd need to write a conversion function to convert the data to known format";
-                                var caption = "Unrecognized format";
-                                MessageBox.Show(msg, caption, MessageBoxButtons.OK);
-                                return;
-                        }
+                        PixelFormat format = PixelFormat.Format32bppArgb;
+                        #region Deprecated Switch
+                        //switch (image.Format)
+                        //{
+                        //    case ImageFormat.Rgb24:
+                        //        MessageBox.Show("1");
+                        //        format = PixelFormat.Format24bppRgb;
+                        //        break;
+                        //    case ImageFormat.Rgba32:
+                        //        format = PixelFormat.Format32bppArgb;
+                        //        break;
+                        //    case ImageFormat.R5g5b5:
+                        //        MessageBox.Show("3");
+                        //        format = PixelFormat.Format16bppRgb555;
+                        //        break;
+                        //    case ImageFormat.R5g6b5:
+                        //        MessageBox.Show("4");
+                        //        format = PixelFormat.Format16bppRgb565;
+                        //        break;
+                        //    case ImageFormat.R5g5b5a1:
+                        //        MessageBox.Show("5");
+                        //        format = PixelFormat.Format16bppArgb1555;
+                        //        break;
+                        //    case ImageFormat.Rgb8:
+                        //        MessageBox.Show("6");
+                        //        format = PixelFormat.Format8bppIndexed;
+                        //        break;
+                        //    default:
+                        //        var msg = $"{image.Format} is not recognized for Bitmap on Windows Forms. " +
+                        //                "You'd need to write a conversion function to convert the data to known format";
+                        //        var caption = "Unrecognized format";
+                        //        MessageBox.Show(msg, caption, MessageBoxButtons.OK);
+                        //        return;
+                        //}
+                        #endregion
                         IntPtr ptr = Marshal.UnsafeAddrOfPinnedArrayElement(image.Data, 0);
                         bitmap = new(image.Width, image.Height, image.Stride, format, ptr);
                         Picbox_ModPicture.Image = bitmap;

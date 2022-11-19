@@ -146,6 +146,12 @@ namespace FS22_ModManagerCore
                                 //Get dds icon file name
                                 XmlNode Node_IconFileName = ModDesc.SelectSingleNode("/modDesc/iconFilename");
                                 string IconFileName = Node_IconFileName.InnerText;
+                                //Get zip file size in MB
+                                long FileSizeInByte = new FileInfo(ZipPathList[i]).Length;
+                                string FileSizeInMb = Convert.ToString(FileSizeInByte / 1048576L, Culture);
+                                //Get file creation and last modification time
+                                string FileCreateTime = Convert.ToString(new FileInfo(ZipPathList[i]).CreationTime, Culture);
+                                string FileLastModifTime = Convert.ToString(new FileInfo(ZipPathList[i]).LastWriteTime, Culture);
                                 //Temporarily Suspend
                                 //using MD5 Hash = MD5.Create();
                                 //byte[] stream = File.ReadAllBytes(ZipPathList[i]);
@@ -159,6 +165,9 @@ namespace FS22_ModManagerCore
                                 ModInfoList[ListIndex].Add(Path.GetFileName(@ZipPathList[i]));
                                 ModInfoList[ListIndex].Add(@ZipPathList[i]);
                                 ModInfoList[ListIndex].Add(IconFileName);
+                                ModInfoList[ListIndex].Add(FileSizeInMb);
+                                ModInfoList[ListIndex].Add(FileCreateTime);
+                                ModInfoList[ListIndex].Add(FileLastModifTime);
                                 //ModInfoList[ListIndex].Add(ModHash);
                                 
                                 //MessageBox.Show(ModInfoList[i][0] + ModInfoList[i][1] + ModInfoList[i][2] + ModInfoList[i][3]);   //DEBUG ONLY
@@ -207,4 +216,4 @@ namespace FS22_ModManagerCore
     //    public string CrossCheck    { get; set; }   //Enable, Disable (CrossCheck with Gamesave)
     //    public string ZipPath       { get; set; }   //Full path for Zip File
     //}
-}
+    }
