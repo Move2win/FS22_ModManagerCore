@@ -324,7 +324,7 @@ namespace FS22_ModManagerCore
                         * ModInfo[9] => FileLastModifTime;
                     */
                     string ModRealName = ModInfo[0];
-                    string ModFileName = ModInfo[4].Replace(".zip", "", StringComparison.Ordinal);
+                    string ModFileName = ModInfo[4][0..^4]; //Remove last four characters (.zip)
                     string[] ItemSet = {ModRealName, ModFileName };
                     Lst_ModList.Items.Add(new ListViewItem(ItemSet));
                 }

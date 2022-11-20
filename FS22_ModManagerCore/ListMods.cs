@@ -105,7 +105,7 @@ namespace FS22_ModManagerCore
                                                     .Replace("\r", "", StringComparison.Ordinal);
                                 if (RealName[..1] == " ")
                                 {
-                                    RealName = RealName.Remove(0, 1);
+                                    RealName = RealName[1..^0];
                                 }
                                 //Get mod version
                                 XmlNode Node_ModVersion = ModDesc.SelectSingleNode("/modDesc/version");
