@@ -14,6 +14,17 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PlatformTarget>x64</PlatformTarget>
     <ApplicationIcon>Resources\Logo_Farming_Simulator_22.ico</ApplicationIcon>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Authors>Move2win</Authors>
+    <Title>FS22 Mod Manager Core</Title>
+    <Description>Prototype and core services for Farming Simulator 22 Mod Manager.</Description>
+    <Copyright>Copyright © 2022 Move2win. All Rights Reserved.</Copyright>
+    <PackageProjectUrl>https://github.com/Move2win/FS22_ModManagerCore</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Move2win/FS22_ModManagerCore</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <FileVersion>1.1.0</FileVersion>
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
