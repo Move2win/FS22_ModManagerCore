@@ -205,7 +205,6 @@ namespace FS22_ModManagerCore
                 if (Selectbox_GameSave.SelectedIndex != 0)
                 {
                     GameSaveXMLpath = GameDatatFolder + "/savegame" + Selectbox_GameSave.SelectedIndex + "/careerSavegame.xml";
-                    MessageBox.Show("Warning: this option doesn't work right now. Please stick to \"Continue Without GameSave\" for now! I will do it at a later time.\r\n" + GameSaveXMLpath);
                     if (File.Exists(GameSaveXMLpath))
                     {
                         Selectbox_GameSave.Enabled = false;
@@ -251,18 +250,31 @@ namespace FS22_ModManagerCore
         #region Read & Display Mod Info
         //
         //Trigger ListMods.cs to read all mod zip files and extract information into a List<List<String>>.
-        //Then display it on Lst_ModList.
         //
         private void Btn_ReadNow_Click(object sender, EventArgs e)
         {
             if (Selectbox_GameSave.SelectedIndex == 0)
             {
-                Lst_ModList.Items.Clear();
-                Txtbox_ModInfoDisplay.Clear();
-                Btn_OpenExplorer.Enabled = Btn_OpenFile.Enabled = false;
-                Picbox_ModPicture.Image = null;
-                ModInfoList = ListMods.ByModFolder(ModFolder, CurrentDescVersion);
-                //Sorting list by certain element group
+                ModInfoList = DisplayMods(ListMods.ByModFolder(ModFolder, CurrentDescVersion));
+            }
+            else
+            {
+                ModInfoList = DisplayMods(ListMods.ByGameSave(GameSaveXMLpath, ModFolder, CurrentDescVersion));
+            }
+        }
+        
+        //
+        //Display mod on Lst_ModList.
+        //
+        private List<List<string>> DisplayMods(List<List<string>> ModInfoList)
+        {
+            Lst_ModList.Items.Clear();
+            Txtbox_ModInfoDisplay.Clear();
+            Btn_OpenExplorer.Enabled = Btn_OpenFile.Enabled = false;
+            Picbox_ModPicture.Image = null;
+            //Sorting list by certain element group
+            if (ModInfoList.Count > 1)  //Can't sort list with only one element
+            {
                 if (Rad_ByModName.Checked)
                 {
                     if (Rad_Ascending.Checked)
@@ -307,31 +319,28 @@ namespace FS22_ModManagerCore
                         ModInfoList = ModInfoList.OrderByDescending(x => Convert.ToInt64(x.ElementAt(7), Culture)).ToList();
                     }
                 }
-                int ModCounts = ModInfoList.Count;
-                foreach (List<string> ModInfo in ModInfoList)
-                {
-                    /*
-                        * ModInfo[0] => RealName;
-                        * ModInfo[1] => ModVersion;
-                        * ModInfo[2] => ModCompatibility;
-                        * ModInfo[3] => Multiplayer;
-                        * ModInfo[4] => Path.GetFileName(@ZipPathList[i]);
-                        * ModInfo[5] => @ZipPathList[i];
-                        * ModInfo[6] => IconFileName;
-                        * ModInfo[7] => FileSizeInMb;
-                        * ModInfo[8] => FileCreateTime;
-                        * ModInfo[9] => FileLastModifTime;
-                    */
-                    string ModRealName = ModInfo[0];
-                    string ModFileName = ModInfo[4][0..^4]; //Remove last four characters (.zip)
-                    string[] ItemSet = {ModRealName, ModFileName };
-                    Lst_ModList.Items.Add(new ListViewItem(ItemSet));
-                }
             }
-            else
+            int ModCounts = ModInfoList.Count;
+            foreach (List<string> ModInfo in ModInfoList)
             {
-                ListMods.ByGameSave(GameSaveXMLpath, CurrentDescVersion);
+                /*
+                    * ModInfo[0] => RealName;
+                    * ModInfo[1] => ModVersion;
+                    * ModInfo[2] => ModCompatibility;
+                    * ModInfo[3] => Multiplayer;
+                    * ModInfo[4] => Path.GetFileName(@ZipPathList[i]);
+                    * ModInfo[5] => @ZipPathList[i];
+                    * ModInfo[6] => IconFileName;
+                    * ModInfo[7] => FileSizeInMb;
+                    * ModInfo[8] => FileCreateTime;
+                    * ModInfo[9] => FileLastModifTime;
+                */
+                string ModRealName = ModInfo[0];
+                string ModFileName = ModInfo[4][0..^4]; //Remove last four characters (.zip)
+                string[] ItemSet = { ModRealName, ModFileName };
+                Lst_ModList.Items.Add(new ListViewItem(ItemSet));
             }
+            return ModInfoList;
         }
         
         //
@@ -378,7 +387,6 @@ namespace FS22_ModManagerCore
                 }
                 catch (NullReferenceException)
                 {
-                    //MessageBox.Show(ModInfoList[SelectIndex][6][..^4] + ".dds");
                     PngFlag = false;
                     ImageEntry = ZipFileContent.GetEntry(ModInfoList[SelectIndex][6][..^4] + ".dds");
                     try
