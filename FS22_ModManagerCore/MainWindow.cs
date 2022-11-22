@@ -12,7 +12,6 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Xml;
 using Pfim;
-using ImageFormat = Pfim.ImageFormat;
 
 namespace FS22_ModManagerCore
 {
@@ -410,40 +409,6 @@ namespace FS22_ModManagerCore
                     {
                         IImage image = Pfimage.FromStream(ImageStream);
                         PixelFormat format = PixelFormat.Format32bppArgb;
-                        #region Deprecated Switch
-                        //switch (image.Format)
-                        //{
-                        //    case ImageFormat.Rgb24:
-                        //        MessageBox.Show("1");
-                        //        format = PixelFormat.Format24bppRgb;
-                        //        break;
-                        //    case ImageFormat.Rgba32:
-                        //        format = PixelFormat.Format32bppArgb;
-                        //        break;
-                        //    case ImageFormat.R5g5b5:
-                        //        MessageBox.Show("3");
-                        //        format = PixelFormat.Format16bppRgb555;
-                        //        break;
-                        //    case ImageFormat.R5g6b5:
-                        //        MessageBox.Show("4");
-                        //        format = PixelFormat.Format16bppRgb565;
-                        //        break;
-                        //    case ImageFormat.R5g5b5a1:
-                        //        MessageBox.Show("5");
-                        //        format = PixelFormat.Format16bppArgb1555;
-                        //        break;
-                        //    case ImageFormat.Rgb8:
-                        //        MessageBox.Show("6");
-                        //        format = PixelFormat.Format8bppIndexed;
-                        //        break;
-                        //    default:
-                        //        var msg = $"{image.Format} is not recognized for Bitmap on Windows Forms. " +
-                        //                "You'd need to write a conversion function to convert the data to known format";
-                        //        var caption = "Unrecognized format";
-                        //        MessageBox.Show(msg, caption, MessageBoxButtons.OK);
-                        //        return;
-                        //}
-                        #endregion
                         IntPtr ptr = Marshal.UnsafeAddrOfPinnedArrayElement(image.Data, 0);
                         bitmap = new(image.Width, image.Height, image.Stride, format, ptr);
                         Picbox_ModPicture.Image = bitmap;
