@@ -7,14 +7,14 @@ This software is currently under development, and will only support Windows10/11
 
 <b>Update:</b>
 
-Preliminary functions have been established. It can now read mods' essential information for a quick check.
+All functions are now available.
 
 ## Previews:
 
 <b>For Farming Simulator 22</b>
 
-![屏幕截图(951)](https://user-images.githubusercontent.com/45490638/202386867-ae214c4e-91a3-4ecc-a522-e53a1a13f900.png)
+![1957](https://user-images.githubusercontent.com/45490638/203924240-c5f2d6d3-69c6-42a9-99ec-68718bf43d39.png)
 
 <b>For Farming Simulator 19</b>
 
-![屏幕截图(952)](https://user-images.githubusercontent.com/45490638/202386953-2a3c10cf-a399-4196-a862-912b8e32ee99.png)
+![2604](https://user-images.githubusercontent.com/45490638/203924684-915ee915-cc56-4b8a-8ad6-a2f407604b25.png)
