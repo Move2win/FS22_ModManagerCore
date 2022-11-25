@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
@@ -11,6 +12,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Xml;
+using Octokit;
 using Pfim;
 
 namespace FS22_ModManagerCore
@@ -25,6 +27,7 @@ namespace FS22_ModManagerCore
         */
         //UserDocumentFolder => "C:\Users\%username%\Documents"
         readonly string  UserDocumentFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        readonly string  AppCurrentTag = "v1.2.0"; //TODO: bump release tag for every new build
         private  string  GameDatatFolder;
         private  string  GameSettingXMLpath;
         private  string  ModFolder;
@@ -33,8 +36,8 @@ namespace FS22_ModManagerCore
         private   int    SelectIndex;
         List<List<string>> ModInfoList;
         readonly CultureInfo Culture = new("en-us");
-
-
+        
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -65,8 +68,9 @@ namespace FS22_ModManagerCore
             else
             {
                 MessageBox.Show("Failed to get CurrentDescVersion from log.txt. Mod update status check will be unavailable at this time.\r\n\nRun the game once and re-open this manager to try again.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                CurrentDescVersion = -1;   //DescVersion unavailable
+                CurrentDescVersion = -1;    //DescVersion unavailable
             }
+            BgUpdateCheck.RunWorkerAsync(); //Checking update from github
         }
         
         /*
@@ -466,6 +470,33 @@ namespace FS22_ModManagerCore
                 UseShellExecute = true
             };
             Process.Start(OpenGithub);
+        }
+        
+        private void BgUpdateCheck_DoWork(object sender, DoWorkEventArgs e)
+        {
+            try
+            {
+                GitHubClient client = new(new ProductHeaderValue("FS22_ModManagerCore"));
+                client.SetRequestTimeout(TimeSpan.FromSeconds(5));
+                var releases = client.Repository.Release.GetLatest(462224668);
+                var latest = releases.Result;
+                if (latest.TagName != AppCurrentTag)
+                {
+                    var result = MessageBox.Show("A new update \"" + latest.TagName + "\" is now available. Would you like to download it now?", "Update",
+                                MessageBoxButtons.YesNo, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+                    if (result == DialogResult.Yes)
+                    {
+                        ProcessStartInfo OpenGithubRelease = new()
+                        {
+                            FileName = "https://github.com/Move2win/FS22_ModManagerCore/releases",
+                            UseShellExecute = true
+                        };
+                        Process.Start(OpenGithubRelease);
+                        Environment.Exit(0);
+                    }
+                }
+            }
+            catch (AggregateException) { }
         }
     }
 }
