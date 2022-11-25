@@ -53,6 +53,7 @@ namespace FS22_ModManagerCore
             this.Gpb_Ssquence = new System.Windows.Forms.GroupBox();
             this.Rad_Descending = new System.Windows.Forms.RadioButton();
             this.Rad_Ascending = new System.Windows.Forms.RadioButton();
+            this.BgUpdateCheck = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.Picbox_ModPicture)).BeginInit();
             this.Gpb_SortingMethod.SuspendLayout();
             this.Gpb_Ssquence.SuspendLayout();
@@ -309,6 +310,10 @@ namespace FS22_ModManagerCore
             this.Rad_Ascending.Text = "Ascending";
             this.Rad_Ascending.UseVisualStyleBackColor = true;
             // 
+            // BgUpdateCheck
+            // 
+            this.BgUpdateCheck.DoWork += new System.ComponentModel.DoWorkEventHandler(this.BgUpdateCheck_DoWork);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -367,6 +372,7 @@ namespace FS22_ModManagerCore
         private System.Windows.Forms.GroupBox Gpb_Ssquence;
         private System.Windows.Forms.RadioButton Rad_Descending;
         private System.Windows.Forms.RadioButton Rad_Ascending;
+        private System.ComponentModel.BackgroundWorker BgUpdateCheck;
     }
 }
 

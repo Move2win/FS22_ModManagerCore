@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
@@ -11,8 +12,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Xml;
+using Octokit;
 using Pfim;
-using ImageFormat = Pfim.ImageFormat;
 
 namespace FS22_ModManagerCore
 {
@@ -26,6 +27,7 @@ namespace FS22_ModManagerCore
         */
         //UserDocumentFolder => "C:\Users\%username%\Documents"
         readonly string  UserDocumentFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        readonly string  AppCurrentTag = "v1.2.0"; //TODO: bump release tag for every new build
         private  string  GameDatatFolder;
         private  string  GameSettingXMLpath;
         private  string  ModFolder;
@@ -34,8 +36,8 @@ namespace FS22_ModManagerCore
         private   int    SelectIndex;
         List<List<string>> ModInfoList;
         readonly CultureInfo Culture = new("en-us");
-
-
+        
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -66,8 +68,9 @@ namespace FS22_ModManagerCore
             else
             {
                 MessageBox.Show("Failed to get CurrentDescVersion from log.txt. Mod update status check will be unavailable at this time.\r\n\nRun the game once and re-open this manager to try again.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                CurrentDescVersion = -1;   //DescVersion unavailable
+                CurrentDescVersion = -1;    //DescVersion unavailable
             }
+            BgUpdateCheck.RunWorkerAsync(); //Checking update from github
         }
         
         /*
@@ -206,7 +209,6 @@ namespace FS22_ModManagerCore
                 if (Selectbox_GameSave.SelectedIndex != 0)
                 {
                     GameSaveXMLpath = GameDatatFolder + "/savegame" + Selectbox_GameSave.SelectedIndex + "/careerSavegame.xml";
-                    MessageBox.Show("Warning: this option doesn't work right now. Please stick to \"Continue Without GameSave\" for now! I will do it at a later time.\r\n" + GameSaveXMLpath);
                     if (File.Exists(GameSaveXMLpath))
                     {
                         Selectbox_GameSave.Enabled = false;
@@ -252,18 +254,31 @@ namespace FS22_ModManagerCore
         #region Read & Display Mod Info
         //
         //Trigger ListMods.cs to read all mod zip files and extract information into a List<List<String>>.
-        //Then display it on Lst_ModList.
         //
         private void Btn_ReadNow_Click(object sender, EventArgs e)
         {
             if (Selectbox_GameSave.SelectedIndex == 0)
             {
-                Lst_ModList.Items.Clear();
-                Txtbox_ModInfoDisplay.Clear();
-                Btn_OpenExplorer.Enabled = Btn_OpenFile.Enabled = false;
-                Picbox_ModPicture.Image = null;
-                ModInfoList = ListMods.ByModFolder(ModFolder, CurrentDescVersion);
-                //Sorting list by certain element group
+                ModInfoList = DisplayMods(ListMods.ByModFolder(ModFolder, CurrentDescVersion));
+            }
+            else
+            {
+                ModInfoList = DisplayMods(ListMods.ByGameSave(GameSaveXMLpath, ModFolder, CurrentDescVersion));
+            }
+        }
+        
+        //
+        //Display mod on Lst_ModList.
+        //
+        private List<List<string>> DisplayMods(List<List<string>> ModInfoList)
+        {
+            Lst_ModList.Items.Clear();
+            Txtbox_ModInfoDisplay.Clear();
+            Btn_OpenExplorer.Enabled = Btn_OpenFile.Enabled = false;
+            Picbox_ModPicture.Image = null;
+            //Sorting list by certain element group
+            if (ModInfoList.Count > 1)  //Can't sort list with only one element
+            {
                 if (Rad_ByModName.Checked)
                 {
                     if (Rad_Ascending.Checked)
@@ -308,31 +323,28 @@ namespace FS22_ModManagerCore
                         ModInfoList = ModInfoList.OrderByDescending(x => Convert.ToInt64(x.ElementAt(7), Culture)).ToList();
                     }
                 }
-                int ModCounts = ModInfoList.Count;
-                foreach (List<string> ModInfo in ModInfoList)
-                {
-                    /*
-                        * ModInfo[0] => RealName;
-                        * ModInfo[1] => ModVersion;
-                        * ModInfo[2] => ModCompatibility;
-                        * ModInfo[3] => Multiplayer;
-                        * ModInfo[4] => Path.GetFileName(@ZipPathList[i]);
-                        * ModInfo[5] => @ZipPathList[i];
-                        * ModInfo[6] => IconFileName;
-                        * ModInfo[7] => FileSizeInMb;
-                        * ModInfo[8] => FileCreateTime;
-                        * ModInfo[9] => FileLastModifTime;
-                    */
-                    string ModRealName = ModInfo[0];
-                    string ModFileName = ModInfo[4].Replace(".zip", "", StringComparison.Ordinal);
-                    string[] ItemSet = {ModRealName, ModFileName };
-                    Lst_ModList.Items.Add(new ListViewItem(ItemSet));
-                }
             }
-            else
+            int ModCounts = ModInfoList.Count;
+            foreach (List<string> ModInfo in ModInfoList)
             {
-                ListMods.ByGameSave(GameSaveXMLpath, CurrentDescVersion);
+                /*
+                    * ModInfo[0] => RealName;
+                    * ModInfo[1] => ModVersion;
+                    * ModInfo[2] => ModCompatibility;
+                    * ModInfo[3] => Multiplayer;
+                    * ModInfo[4] => Path.GetFileName(@ZipPathList[i]);
+                    * ModInfo[5] => @ZipPathList[i];
+                    * ModInfo[6] => IconFileName;
+                    * ModInfo[7] => FileSizeInMb;
+                    * ModInfo[8] => FileCreateTime;
+                    * ModInfo[9] => FileLastModifTime;
+                */
+                string ModRealName = ModInfo[0];
+                string ModFileName = ModInfo[4][0..^4]; //Remove last four characters (.zip)
+                string[] ItemSet = { ModRealName, ModFileName };
+                Lst_ModList.Items.Add(new ListViewItem(ItemSet));
             }
+            return ModInfoList;
         }
         
         //
@@ -379,7 +391,6 @@ namespace FS22_ModManagerCore
                 }
                 catch (NullReferenceException)
                 {
-                    //MessageBox.Show(ModInfoList[SelectIndex][6][..^4] + ".dds");
                     PngFlag = false;
                     ImageEntry = ZipFileContent.GetEntry(ModInfoList[SelectIndex][6][..^4] + ".dds");
                     try
@@ -410,40 +421,6 @@ namespace FS22_ModManagerCore
                     {
                         IImage image = Pfimage.FromStream(ImageStream);
                         PixelFormat format = PixelFormat.Format32bppArgb;
-                        #region Deprecated Switch
-                        //switch (image.Format)
-                        //{
-                        //    case ImageFormat.Rgb24:
-                        //        MessageBox.Show("1");
-                        //        format = PixelFormat.Format24bppRgb;
-                        //        break;
-                        //    case ImageFormat.Rgba32:
-                        //        format = PixelFormat.Format32bppArgb;
-                        //        break;
-                        //    case ImageFormat.R5g5b5:
-                        //        MessageBox.Show("3");
-                        //        format = PixelFormat.Format16bppRgb555;
-                        //        break;
-                        //    case ImageFormat.R5g6b5:
-                        //        MessageBox.Show("4");
-                        //        format = PixelFormat.Format16bppRgb565;
-                        //        break;
-                        //    case ImageFormat.R5g5b5a1:
-                        //        MessageBox.Show("5");
-                        //        format = PixelFormat.Format16bppArgb1555;
-                        //        break;
-                        //    case ImageFormat.Rgb8:
-                        //        MessageBox.Show("6");
-                        //        format = PixelFormat.Format8bppIndexed;
-                        //        break;
-                        //    default:
-                        //        var msg = $"{image.Format} is not recognized for Bitmap on Windows Forms. " +
-                        //                "You'd need to write a conversion function to convert the data to known format";
-                        //        var caption = "Unrecognized format";
-                        //        MessageBox.Show(msg, caption, MessageBoxButtons.OK);
-                        //        return;
-                        //}
-                        #endregion
                         IntPtr ptr = Marshal.UnsafeAddrOfPinnedArrayElement(image.Data, 0);
                         bitmap = new(image.Width, image.Height, image.Stride, format, ptr);
                         Picbox_ModPicture.Image = bitmap;
@@ -493,6 +470,33 @@ namespace FS22_ModManagerCore
                 UseShellExecute = true
             };
             Process.Start(OpenGithub);
+        }
+        
+        private void BgUpdateCheck_DoWork(object sender, DoWorkEventArgs e)
+        {
+            try
+            {
+                GitHubClient client = new(new ProductHeaderValue("FS22_ModManagerCore"));
+                client.SetRequestTimeout(TimeSpan.FromSeconds(5));
+                var releases = client.Repository.Release.GetLatest(462224668);
+                var latest = releases.Result;
+                if (latest.TagName != AppCurrentTag)
+                {
+                    var result = MessageBox.Show("A new update \"" + latest.TagName + "\" is now available. Would you like to download it now?", "Update",
+                                MessageBoxButtons.YesNo, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1);
+                    if (result == DialogResult.Yes)
+                    {
+                        ProcessStartInfo OpenGithubRelease = new()
+                        {
+                            FileName = "https://github.com/Move2win/FS22_ModManagerCore/releases",
+                            UseShellExecute = true
+                        };
+                        Process.Start(OpenGithubRelease);
+                        Environment.Exit(0);
+                    }
+                }
+            }
+            catch (AggregateException) { }
         }
     }
 }

@@ -10,7 +10,6 @@
     <ErrorReport>none</ErrorReport>
     <StartupObject>FS22_ModManagerCore.Program</StartupObject>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-    <IncludeSymbols>True</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PlatformTarget>x64</PlatformTarget>
     <ApplicationIcon>Resources\Logo_Farming_Simulator_22.ico</ApplicationIcon>
@@ -22,13 +21,13 @@
     <PackageProjectUrl>https://github.com/Move2win/FS22_ModManagerCore</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Move2win/FS22_ModManagerCore</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <AssemblyVersion>1.1.0</AssemblyVersion>
-    <FileVersion>1.1.0</FileVersion>
-    <Version>1.1.0</Version>
+    <AssemblyVersion>1.2.0</AssemblyVersion>
+    <FileVersion>1.2.0</FileVersion>
+    <Version>1.2.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DebugType>embedded</DebugType>
+    <DebugType>pdbonly</DebugType>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <NoWarn>IDE0063;CA1002;CA1303;CA1707;CA1014;CA2000</NoWarn>
     <WarningLevel>6</WarningLevel>
@@ -36,7 +35,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>embedded</DebugType>
+    <DebugType>none</DebugType>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <NoWarn>IDE0063;CA1002;CA1303;CA1707;CA1014;CA2000</NoWarn>
     <WarningLevel>6</WarningLevel>
@@ -54,6 +53,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Octokit" Version="4.0.1" />
     <PackageReference Include="Pfim" Version="0.11.1" />
   </ItemGroup>
 

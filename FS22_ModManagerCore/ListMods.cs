@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Windows.Forms;
 using System.Xml;
@@ -20,7 +21,6 @@ namespace FS22_ModManagerCore
             //A set(array) of strings contains every .zip file in the mod path. Each path could be extracted using "@ZipPathList[Index]."
             string[] ZipPathList = Directory.GetFiles(ModFolder, "*.zip", SearchOption.TopDirectoryOnly);    //Load path into ZipPathList[]
             int ZipPathListSize = ZipPathList.Length;   //Almost the total number of mods, but didn't remove the "non-mod .zip" count yet.
-            //MessageBox.Show(Convert.ToString(ZipPathListSize, Culture)); //DEBUG ONLY
             //A two-dimensional list of strings contains mod info. It can be accessed by ModInfoList[Index1][Index2].
             //It will return to class "MainWindow" to respond to the "ReadNow" button click.
             List<List<string>> ModInfoList = new();
@@ -63,7 +63,6 @@ namespace FS22_ModManagerCore
                                     using (var writer = new StreamWriter(ErrorZipEntry.Open()))
                                     {
                                         writer.WriteLine(Declaration);                      //Line 1
-                                        //MessageBox.Show(@ZipPathList[i]);                   //DEBUG ONLY
                                         for (int j = 1; j < TextForEachLine.Length; j++)    //Start with Line 2 (Index j=1)
                                         {
                                             if (!TextForEachLine[j].Trim().StartsWith("<?", false, Culture))
@@ -80,7 +79,6 @@ namespace FS22_ModManagerCore
                                 catch (XmlException)
                                 {
                                     XmlLoadException = true;
-                                    //MessageBox.Show(Convert.ToString(exagain, Culture));  //DEBUG ONLY
                                 }
                             }
                         }
@@ -105,7 +103,7 @@ namespace FS22_ModManagerCore
                                                     .Replace("\r", "", StringComparison.Ordinal);
                                 if (RealName[..1] == " ")
                                 {
-                                    RealName = RealName.Remove(0, 1);
+                                    RealName = RealName[1..^0];
                                 }
                                 //Get mod version
                                 XmlNode Node_ModVersion = ModDesc.SelectSingleNode("/modDesc/version");
@@ -169,14 +167,6 @@ namespace FS22_ModManagerCore
                                 ModInfoList[ListIndex].Add(FileCreateTime);
                                 ModInfoList[ListIndex].Add(FileLastModifTime);
                                 //ModInfoList[ListIndex].Add(ModHash);
-                                
-                                //MessageBox.Show(ModInfoList[i][0] + ModInfoList[i][1] + ModInfoList[i][2] + ModInfoList[i][3]);   //DEBUG ONLY
-                                
-                                //MessageBox.Show(@ZipPathList[i] + DescVersion);       //DEBUG ONLY
-                                //if (i == ZipPathListSize - 1)                         //.
-                                //{                                                     //.
-                                //    MessageBox.Show(@ZipPathList[i] + DescVersion);   //.
-                                //}                                                     //DEBUG ONLY
                             }
                             else
                             {
@@ -194,26 +184,28 @@ namespace FS22_ModManagerCore
                 }
                 catch (InvalidDataException)
                 {
-                    MessageBox.Show("This zip file might already be broken or need to be unzipped. Please consider to remove or extract this zip file.\r\n\n" + ZipPathList[i]);
+                    MessageBox.Show("This zip file might already be broken or need to be unzipped. " +
+                    "Please consider to remove or unzip this zip file.\r\n\n" + ZipPathList[i]);
                     NonModCount++;
                 }
             }
             return ModInfoList;
         }
         
-        public static void ByGameSave(string GameSaveXMLpath, int CurrentDescVersion)
+        public static List<List<string>> ByGameSave(string GameSaveXMLpath, string ModFolder, int CurrentDescVersion)
         {
-            
+            List<List<string>> ModInfoList = ByModFolder(ModFolder, CurrentDescVersion);
+            List<string> ModNameInUse = new();
+            XmlDocument GameSaveXML = new();
+            GameSaveXML.Load(GameSaveXMLpath);
+            //Get all mods name for selected gamesave
+            XmlNodeList ModNodeList = GameSaveXML.SelectNodes("/careerSavegame/mod");
+            foreach (XmlNode Node_Mod in ModNodeList)
+            {
+                ModNameInUse.Add(Node_Mod.Attributes["modName"].InnerText + ".zip");
+            }
+            //Return the list only containing mods used in the gamesave
+            return ModInfoList.Where(list => ModNameInUse.Intersect(list).Any()).ToList();
         }
     }
-    
-    //Deprecated
-    //public class ModInfo
-    //{
-    //    public string ZipFileName   { get; set; }   //Use to reload the zip file content when need
-    //    public string ModRealName   { get; set; }   //Use to display name in Listbox (read modDesc)
-    //    public string ModStatus     { get; set; }   //Current, Old Version, Not Compatible (read modDesc's version)
-    //    public string CrossCheck    { get; set; }   //Enable, Disable (CrossCheck with Gamesave)
-    //    public string ZipPath       { get; set; }   //Full path for Zip File
-    //}
-    }
+}
